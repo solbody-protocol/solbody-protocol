@@ -25,12 +25,12 @@ Let's go through each step.
 
 ## 1. Initialize services
 
-We start by initializing the services. To do this, we clone the Barge repository and run it. This will run the current default versions of [Aquarius](https://github.com/oceanprotocol/aquarius), [Provider](https://github.com/oceanprotocol/provider-py), and [Ganache](https://github.com/trufflesuite/ganache-cli) with [our contracts](https://github.com/oceanprotocol/ocean-contracts) deployed to it.
+We start by initializing the services. To do this, we clone the Barge repository and run it. This will run the current default versions of [Aquarius](https://github.com/solbodyprotocol/aquarius), [Provider](https://github.com/solbodyprotocol/provider-py), and [Ganache](https://github.com/trufflesuite/ganache-cli) with [our contracts](https://github.com/solbodyprotocol/solbody-contracts) deployed to it.
 
 ```bash
-git clone https://github.com/oceanprotocol/barge.git
+git clone https://github.com/solbodyprotocol/barge.git
 cd barge/
-./start_ocean.sh --with-provider2 --no-dashboard
+./start_solbody.sh --with-provider2 --no-dashboard
 ```
 
 ## 2. Create a new node.js project
@@ -52,8 +52,8 @@ Open the package.json file in a text editor and update the dependancies to inclu
 
 ```JSON
   "dependencies": {
-    "@oceanprotocol/contracts": "^0.5.6",
-    "@oceanprotocol/lib": "^0.6.5",
+    "@solbodyprotocol/contracts": "^0.5.6",
+    "@solbodyprotocol/lib": "^0.6.5",
     "web3": "^1.3.0"
   }
 ```
@@ -75,7 +75,7 @@ cat > config.js
 Now open the config.js in your code editor and enter the following:
 
 ```Javascript
-const { ConfigHelper } = require("@oceanprotocol/lib");
+const { ConfigHelper } = require("@solbodyprotocol/lib");
 const Web3 = require("web3");
 const defaultConfig = new ConfigHelper().getConfig("development");
 
@@ -90,7 +90,7 @@ const contracts = {
   "BFactory": "0x_YOUR_DTFactory_ADDRESS_",
   "FixedRateExchange": "0x_YOUR_DTFactory_ADDRESS_",
   "Metadata": "0x_YOUR_Metadata_ADDRESS_",
-  "Ocean": "0x_YOUR_Ocean_ADDRESS_"
+  "Solbody": "0x_YOUR_Solbody_ADDRESS_"
 };
 
 const config = {
@@ -111,7 +111,7 @@ module.exports = {
 Now check what your contract addresses are locally. In your terminal run:
 
 ```bash
-cat ~/.ocean/ocean-contracts/artifacts/address.json
+cat ~/.solbody/solbody-contracts/artifacts/address.json
 ```
 
 Next, update the contract addresses in your config.js file. Replace each of the place holders with the actual addresses that were outputted into your terminal. 
@@ -121,19 +121,19 @@ Now open the `marketplace.js` file in your text editor. Enter the following code
 
 ```Javascript
 const Web3 = require("web3");
-const { Ocean, DataTokens } = require("@oceanprotocol/lib");
+const { Solbody, DataTokens } = require("@solbodyprotocol/lib");
 
-const { factoryABI } = require("@oceanprotocol/contracts/artifacts/DTFactory.json");
-const { datatokensABI } = require("@oceanprotocol/contracts/artifacts/DataTokenTemplate.json");
+const { factoryABI } = require("@solbodyprotocol/contracts/artifacts/DTFactory.json");
+const { datatokensABI } = require("@solbodyprotocol/contracts/artifacts/DataTokenTemplate.json");
 const { config, contracts, urls } = require("./config");
 
 
 
 const init = async () => {
-  const ocean = await Ocean.getInstance(config);
+  const solbody = await Solbody.getInstance(config);
   const blob = `http://localhost:8030/api/v1/services/consume`;
 
-  const accounts = await ocean.accounts.list();
+  const accounts = await solbody.accounts.list();
   const alice = accounts[0].id;
   console.log('Alice account address:', alice)
 
@@ -156,7 +156,7 @@ Now in your terminal, run the following command:
 node marketplace.js
 ```
 
-Congratulations, you've created your first Ocean datatoken! 🌊🐋
+Congratulations, you've created your first Solbody datatoken! 🌊🐋
 
 ## 6. Mint 200 tokens
 
@@ -218,7 +218,7 @@ const { testData } = require("./data");
 At the end of the `init() { ... }` function (after `console.log('Bob token balance:', bobBalance)`) add the following code:
 
 ```Javascript
-  dataService = await ocean.assets.createAccessServiceAttributes(
+  dataService = await solbody.assets.createAccessServiceAttributes(
     accounts[0],
     10, // set the price in datatoken
     new Date(Date.now()).toISOString().split(".")[0] + "Z", // publishedDate
@@ -226,7 +226,7 @@ At the end of the `init() { ... }` function (after `console.log('Bob token balan
   );
 
   // publish asset
-  const createData = await ocean.assets.create(
+  const createData = await solbody.assets.create(
     testData,
     accounts[0],
     [dataService],
@@ -313,9 +313,9 @@ In this section we show how the maketplace can post the dataset for sale.
 First, in the same terminal that you are running your files, enter the following command: 
 
 ```bash
-export ADDRESS_FILE="${HOME}/.ocean/ocean-contracts/artifacts/address.json"
+export ADDRESS_FILE="${HOME}/.solbody/solbody-contracts/artifacts/address.json"
 ```
-This tells ocean.js the location of the contract addresses. 
+This tells solbody.js the location of the contract addresses. 
 
 At the end of the `init() { ... }` function (after `console.log("Alice balance:", aliceBalance)`) add the following code:
 
@@ -323,8 +323,8 @@ At the end of the `init() { ... }` function (after `console.log("Alice balance:"
 // Wait for datatoken to be published
 await new Promise(r => setTimeout(r, 15000)); 
 
-const asset = await ocean.assets.resolve(dataId)
-const accessService = await ocean.assets.getServiceByType(asset.id, 'access')
+const asset = await solbody.assets.resolve(dataId)
+const accessService = await solbody.assets.getServiceByType(asset.id, 'access')
 console.log("accessService", accessService)
 ```
 
@@ -375,10 +375,10 @@ Finally, Bob downloads the dataset. This is is a two part process where he first
 At the end of the `init() { ... }` function (after `console.log("bobTransaction", bobTransaction)`) add the following code:
 
 ```javascript
-const bobTransaction = await ocean.assets.order(asset.id, accessService.type, bob)
+const bobTransaction = await solbody.assets.order(asset.id, accessService.type, bob)
 console.log("bobTransaction", bobTransaction)
 
-const data = await ocean.assets.download(
+const data = await solbody.assets.download(
   asset.id,
   bobTransaction,
   tokenAddress,
@@ -403,7 +403,7 @@ In the terminal output you should see a new directory has been created that cont
 To view Bob's previous orders you can enter the following code at the end of the `init() { ... }` function (after `console.log("Bob token balance:", bobBalance)`):
 
 ```javascript
-const history = await ocean.assets.getOrderHistory(accounts[2])
+const history = await solbody.assets.getOrderHistory(accounts[2])
 console.log("Bob's history", history)
 ```
 
@@ -411,12 +411,12 @@ If you save the file and run it again you should see all of Bob's previous order
 
 ## 13. Extensions
 
-Congratulations on completing the Oceon.js Marketplace tutorial 🌊🐋🐠. This has given you a solid foundation upon which you can start using Ocean.js. There is still a lot more you can do with Ocean.js, here are some suggestions for next steps to continue learning: 
+Congratulations on completing the Oceon.js Marketplace tutorial 🌊🐋🐠. This has given you a solid foundation upon which you can start using Solbody.js. There is still a lot more you can do with Solbody.js, here are some suggestions for next steps to continue learning: 
 
-1. Check Alice's order history using `ocean.assets.getOrderHistory(accounts[0])`
-2. List all of Alice's assets with `ocean.assets.ownerAssets(alice)`
-3. Update metadata for Alice's dataset using `ocean.assets.editMetadata(ddo, newMetaData)` 
-4. Update the new metadata onchain with `ocean.onChainMetadata.update(newDdo.id, newDdo, alice)`
-5. Check the metadata with `ocean.assets.getServiceByType(ddo.id, 'metadata')`
-6. Update the timeout for the dataset with `ocean.assets.editServiceTimeout(ddo, serviceIndex, newTimeout)`
+1. Check Alice's order history using `solbody.assets.getOrderHistory(accounts[0])`
+2. List all of Alice's assets with `solbody.assets.ownerAssets(alice)`
+3. Update metadata for Alice's dataset using `solbody.assets.editMetadata(ddo, newMetaData)` 
+4. Update the new metadata onchain with `solbody.onChainMetadata.update(newDdo.id, newDdo, alice)`
+5. Check the metadata with `solbody.assets.getServiceByType(ddo.id, 'metadata')`
+6. Update the timeout for the dataset with `solbody.assets.editServiceTimeout(ddo, serviceIndex, newTimeout)`
 
