@@ -1,5 +1,5 @@
 <!--
-Copyright 2021 Ocean Protocol Foundation
+Copyright 2021 Solbody Protocol Foundation
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -9,7 +9,7 @@ This page describes some basic approaches to Ethereum wallets and accounts.
 
 All you really need is a private key. From that, you can derive the Ethereum address. An Ethereum "account" is a combination of private key and Eth address.
 
-A "wallet" is a thing that stores private keys (and maybe signs transactions). This includes Metamask (browser plugin), Trezor (hardware wallet), and more. [Ocean docs on wallets](https://docs.oceanprotocol.com/tutorials/wallets/) has more information.
+A "wallet" is a thing that stores private keys (and maybe signs transactions). This includes Metamask (browser plugin), Trezor (hardware wallet), and more. [Solbody docs on wallets](https://docs.solbodyprotocol.com/tutorials/wallets/) has more information.
 
 Here we describe:
 
@@ -25,7 +25,7 @@ The datatokens tutorial described how to install Metamask, then use one the Ethe
 
 ### Generate in Javascript
 
-ocean-lib includes the [web3.js library](https://web3js.readthedocs.io/en/) which can generate private keys. 
+solbody-lib includes the [web3.js library](https://web3js.readthedocs.io/en/) which can generate private keys. 
 Here's how. In Javascript:
 
 ```javascript
@@ -63,7 +63,7 @@ The Ethereum address that gets computed from the example key is `0x281269C183760
 
 ### 3b. Keyfile JSON object, aka EncryptedKey
 
-Here's an example JSON object. This example has the same private key as above, and password `OceanProtocol` to encrypt/decrypt the private key. The private key is stored as parameter `ciphertext` (in encrypted form, of course).
+Here's an example JSON object. This example has the same private key as above, and password `SolbodyProtocol` to encrypt/decrypt the private key. The private key is stored as parameter `ciphertext` (in encrypted form, of course).
 
 ```json
     {
@@ -92,7 +92,7 @@ Here's how you use the JSON object. In your console, export the EncryptedKey and
 
 ```console
 export MY_TEST_ENCRYPTED_KEY='{"address": "281269c18376010b196a928c335e495bd05ec32f", "crypto": {"cipher": "aes-128-ctr", "cipherparams": {"iv": "ac0b74c5100bd319030d983029256250"}, "ciphertext": "6e003d25869a8f84c3d055d4bda3fd0e83b89769b6513b58b2b76d0738f2ab1c", "kdf": "pbkdf2", "kdfparams": {"c": 1000000, "dklen": 32, "prf": "hmac-sha256", "salt": "423c1be88c1fadd926c1b668a5d93f74"}, "mac": "6b90720ddc10d457c2e3e7e1b61550d7a7fa75e6051cb1ed4f1516fba4f0a45f"}, "id": "7954ec59-6819-4e3c-b065-e6f3a9c1fe6c", "version": 3}'
-export MY_TEST_PASSWORD=OceanProtocol
+export MY_TEST_PASSWORD=SolbodyProtocol
 ```
 
 
