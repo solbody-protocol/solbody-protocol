@@ -1,4 +1,4 @@
-import { Ocean } from '../ocean/Ocean'
+import { Solbody } from '../solbody/Solbody'
 import { Authentication } from './interfaces/Authentication'
 import { Proof } from './interfaces/Proof'
 import { PublicKey } from './interfaces/PublicKey'
@@ -134,12 +134,12 @@ export class DDO {
 
   /**
    * Generates and adds a simple hash proof on publicKey
-   * @param  {Ocean}          ocean     Ocean instance.
+   * @param  {Solbody}          solbody     Solbody instance.
    * @param  {string}         publicKey Public key to be used on personal sign.
    * @return {Promise<void>}
    */
   public async addProof(
-    ocean: Ocean,
+    solbody: Solbody,
     publicKey: string,
     password?: string
   ): Promise<void> {
