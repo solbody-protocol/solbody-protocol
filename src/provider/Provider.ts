@@ -1,4 +1,4 @@
-import Account from '../ocean/Account'
+import Account from '../solbody/Account'
 import { noZeroX, assetResolve } from '../utils'
 import { Instantiable, InstantiableConfig } from '../Instantiable.abstract'
 import { File } from '../ddo/interfaces/File'
@@ -7,9 +7,9 @@ import {
   ComputeInput,
   ComputeOutput,
   ComputeAlgorithm
-} from '../ocean/interfaces/Compute'
+} from '../solbody/interfaces/Compute'
 import { DDO } from '../ddo/DDO'
-import DID from '../ocean/DID'
+import DID from '../solbody/DID'
 import { Service } from '../ddo/interfaces'
 
 export interface ServiceEndpoint {
@@ -72,7 +72,7 @@ export class Provider extends Instantiable {
   public async getServiceEndpoints(): Promise<ServiceEndpoint[]> {
     const serviceEndpoints: ServiceEndpoint[] = []
     try {
-      const result = await (await this.ocean.utils.fetch.get(this.url)).json()
+      const result = await (await this.solbody.utils.fetch.get(this.url)).json()
       this.providerAddress = result.providerAddress
       if ('computeAddress' in result) this.computeAddress = result.computeAddress
       if ('version' in result) this.providerVersion = result.version
@@ -101,7 +101,7 @@ export class Provider extends Instantiable {
   }
 
   public async createSignature(account: Account, agreementId: string): Promise<string> {
-    const signature = await this.ocean.utils.signature.signText(
+    const signature = await this.solbody.utils.signature.signText(
       noZeroX(agreementId),
       account.getId()
     )
@@ -110,7 +110,7 @@ export class Provider extends Instantiable {
   }
 
   public async createHashSignature(account: Account, message: string): Promise<string> {
-    const signature = await this.ocean.utils.signature.signWithHash(
+    const signature = await this.solbody.utils.signature.signWithHash(
       message,
       account.getId()
     )
@@ -128,7 +128,7 @@ export class Provider extends Instantiable {
     const path = this.getEncryptEndpoint() ? this.getEncryptEndpoint().urlPath : null
     if (!path) return null
     try {
-      const response = await this.ocean.utils.fetch.post(
+      const response = await this.solbody.utils.fetch.post(
         path,
         decodeURI(JSON.stringify(args))
       )
@@ -149,7 +149,7 @@ export class Provider extends Instantiable {
     const path = this.getFileinfoEndpoint() ? this.getFileinfoEndpoint().urlPath : null
     if (!path) return null
     try {
-      const response = await this.ocean.utils.fetch.post(path, JSON.stringify(args))
+      const response = await this.solbody.utils.fetch.post(path, JSON.stringify(args))
       const results: File[] = await response.json()
       for (const result of results) {
         files.push(result)
@@ -162,13 +162,13 @@ export class Provider extends Instantiable {
 
   public async isFileConsumable(did: DID, serviceIndex: number): Promise<boolean> {
     const args = { did: did.getDid() }
-    const ddo = await this.ocean.metadataCache.retrieveDDO(did)
+    const ddo = await this.solbody.metadataCache.retrieveDDO(did)
     if (!ddo) return false
     const service: Service = ddo.findServiceById(serviceIndex)
     if (!service) return false
     const path = service.serviceEndpoint + '/api/v1/services/fileinfo'
     try {
-      const response = await this.ocean.utils.fetch.post(path, JSON.stringify(args))
+      const response = await this.solbody.utils.fetch.post(path, JSON.stringify(args))
       const results = await response.json()
       return results[0].valid
     } catch (e) {
@@ -184,7 +184,7 @@ export class Provider extends Instantiable {
     const path = this.getNonceEndpoint() ? this.getNonceEndpoint().urlPath : null
     if (!path) return null
     try {
-      const response = await this.ocean.utils.fetch.get(
+      const response = await this.solbody.utils.fetch.get(
         path + `?userAddress=${consumerAddress}`
       )
       this.nonce = String((await response.json()).nonce)
@@ -202,7 +202,7 @@ export class Provider extends Instantiable {
     consumerAddress: string,
     userCustomParameters?: UserCustomParameters
   ): Promise<string> {
-    const { did, ddo } = await assetResolve(asset, this.ocean)
+    const { did, ddo } = await assetResolve(asset, this.solbody)
     let initializeUrl = this.getInitializeEndpoint()
       ? this.getInitializeEndpoint().urlPath
       : null
@@ -215,7 +215,7 @@ export class Provider extends Instantiable {
     if (userCustomParameters)
       initializeUrl += '&userdata=' + encodeURI(JSON.stringify(userCustomParameters))
     try {
-      const response = await this.ocean.utils.fetch.get(initializeUrl)
+      const response = await this.solbody.utils.fetch.get(initializeUrl)
       return await response.text()
     } catch (e) {
       this.logger.error(e)
@@ -255,8 +255,8 @@ export class Provider extends Instantiable {
           consumeUrl += '&userdata=' + encodeURI(JSON.stringify(userCustomParameters))
         try {
           !destination
-            ? await this.ocean.utils.fetch.downloadFileBrowser(consumeUrl)
-            : await this.ocean.utils.fetch.downloadFile(consumeUrl, destination, i)
+            ? await this.solbody.utils.fetch.downloadFileBrowser(consumeUrl)
+            : await this.solbody.utils.fetch.downloadFile(consumeUrl, destination, i)
         } catch (e) {
           this.logger.error('Error consuming assets')
           this.logger.error(e)
@@ -316,7 +316,7 @@ export class Provider extends Instantiable {
       : null
     if (!path) return null
     try {
-      const response = await this.ocean.utils.fetch.post(path, JSON.stringify(payload))
+      const response = await this.solbody.utils.fetch.post(path, JSON.stringify(payload))
       if (response?.ok) {
         const params = await response.json()
         return params
@@ -356,7 +356,7 @@ export class Provider extends Instantiable {
       : null
     if (!path) return null
     try {
-      const response = await this.ocean.utils.fetch.put(path, JSON.stringify(payload))
+      const response = await this.solbody.utils.fetch.put(path, JSON.stringify(payload))
       if (response?.ok) {
         const params = await response.json()
         return params
@@ -396,7 +396,7 @@ export class Provider extends Instantiable {
       : null
     if (!path) return null
     try {
-      const response = await this.ocean.utils.fetch.delete(path, JSON.stringify(payload))
+      const response = await this.solbody.utils.fetch.delete(path, JSON.stringify(payload))
       if (response?.ok) {
         const params = await response.json()
         return params
@@ -433,7 +433,7 @@ export class Provider extends Instantiable {
       : null
     if (!path) return null
     try {
-      const response = await this.ocean.utils.fetch.get(path + url)
+      const response = await this.solbody.utils.fetch.get(path + url)
       /* response = await fetch(this.getComputeEndpoint() + url, {
         method: 'GET',
         timeout: 5000
@@ -480,8 +480,8 @@ export class Provider extends Instantiable {
 
     try {
       !destination
-        ? await this.ocean.utils.fetch.downloadFileBrowser(consumeUrl)
-        : await this.ocean.utils.fetch.downloadFile(consumeUrl, destination, index)
+        ? await this.solbody.utils.fetch.downloadFileBrowser(consumeUrl)
+        : await this.solbody.utils.fetch.downloadFile(consumeUrl, destination, index)
     } catch (e) {
       this.logger.error('Error getting job result')
       this.logger.error(e)
@@ -536,7 +536,7 @@ export class Provider extends Instantiable {
    */
   public async isValidProvider(url: string): Promise<boolean> {
     try {
-      const response = await this.ocean.utils.fetch.get(url)
+      const response = await this.solbody.utils.fetch.get(url)
       if (response?.ok) {
         const params = await response.json()
         if (params && params.providerAddress) return true
