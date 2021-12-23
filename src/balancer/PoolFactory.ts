@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 import { AbiItem } from 'web3-utils/types'
 import { Logger, setContractDefaults, getFairGasPrice } from '../utils'
-import jsonFactoryABI from '@oceanprotocol/contracts/artifacts/BFactory.json'
+import jsonFactoryABI from '@solbodyprotocol/contracts/artifacts/BFactory.json'
 import { TransactionReceipt } from 'web3-core'
 import { ConfigHelperConfig } from '../utils/ConfigHelper'
 
