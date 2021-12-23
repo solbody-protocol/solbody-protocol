@@ -1,5 +1,5 @@
 import { DDO } from '../ddo/DDO'
-import { Ocean } from '../ocean/Ocean'
+import { Solbody } from '../solbody/Solbody'
 
 export interface AssetResolved {
   did: string
@@ -12,14 +12,14 @@ export function isDdo(arg: any): arg is DDO {
 
 export async function assetResolve(
   asset: DDO | string,
-  ocean: Ocean
+  solbody: Solbody
 ): Promise<AssetResolved> {
   if (isDdo(asset)) {
     const did = asset.id
     const ddo = asset
     return { did, ddo }
   } else {
-    const ddo = await ocean.assets.resolve(asset)
+    const ddo = await solbody.assets.resolve(asset)
     const did = ddo.id
     return { did, ddo }
   }
