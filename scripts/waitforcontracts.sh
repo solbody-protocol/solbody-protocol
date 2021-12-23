@@ -1,8 +1,8 @@
-while [ ! -f "${HOME}/.ocean/ocean-contracts/artifacts/ready" ]; do
+while [ ! -f "${HOME}/.solbody/solbody-contracts/artifacts/ready" ]; do
   sleep 2
 done
 
-cat "barge/start_ocean.log"
-ls -lh "${HOME}/.ocean/ocean-contracts/"
-ls -lh "${HOME}/.ocean/ocean-contracts/artifacts/"
-cat "${HOME}/.ocean/ocean-contracts/artifacts/address.json"
+cat "barge/start_solbody.log"
+ls -lh "${HOME}/.solbody/solbody-contracts/"
+ls -lh "${HOME}/.solbody/solbody-contracts/artifacts/"
+cat "${HOME}/.solbody/solbody-contracts/artifacts/address.json"
