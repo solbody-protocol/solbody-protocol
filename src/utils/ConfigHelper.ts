@@ -2,7 +2,7 @@ import Config from '../models/Config'
 import fs from 'fs'
 import { homedir } from 'os'
 // eslint-disable-next-line import/no-named-default
-import { default as DefaultContractsAddresses } from '@oceanprotocol/contracts/artifacts/address.json'
+import { default as DefaultContractsAddresses } from '@solbodyprotocol/contracts/artifacts/address.json'
 import Logger from './Logger'
 
 export interface ConfigHelperConfig extends Config {
@@ -10,7 +10,7 @@ export interface ConfigHelperConfig extends Config {
   network: string
   subgraphUri: string
   explorerUri: string
-  oceanTokenSymbol: string
+  solbodyTokenSymbol: string
   transactionBlockTimeout: number
   transactionConfirmationBlocks: number
   transactionPollingTimeout: number
@@ -20,13 +20,13 @@ export interface ConfigHelperConfig extends Config {
 const configHelperNetworksBase: ConfigHelperConfig = {
   networkId: null,
   network: 'unknown',
-  metadataCacheUri: 'https://aquarius.oceanprotocol.com',
+  metadataCacheUri: 'https://aquarius.solbodyprotocol.com',
   nodeUri: 'http://localhost:8545',
   providerUri: 'http://127.0.0.1:8030',
   subgraphUri: null,
   explorerUri: null,
-  oceanTokenAddress: null,
-  oceanTokenSymbol: 'OCEAN',
+  solbodyTokenAddress: null,
+  solbodyTokenSymbol: 'SOLBODY',
   factoryAddress: '0x1234',
   poolFactoryAddress: null,
   fixedRateExchangeAddress: null,
@@ -56,8 +56,8 @@ export const configHelperNetworks: ConfigHelperConfig[] = [
     networkId: 3,
     network: 'ropsten',
     nodeUri: 'https://ropsten.infura.io/v3',
-    providerUri: 'https://provider.ropsten.oceanprotocol.com',
-    subgraphUri: 'https://subgraph.ropsten.oceanprotocol.com',
+    providerUri: 'https://provider.ropsten.solbodyprotocol.com',
+    subgraphUri: 'https://subgraph.ropsten.solbodyprotocol.com',
     explorerUri: 'https://ropsten.etherscan.io',
     startBlock: 9227563
   },
@@ -66,8 +66,8 @@ export const configHelperNetworks: ConfigHelperConfig[] = [
     networkId: 4,
     network: 'rinkeby',
     nodeUri: 'https://rinkeby.infura.io/v3',
-    providerUri: 'https://provider.rinkeby.oceanprotocol.com',
-    subgraphUri: 'https://subgraph.rinkeby.oceanprotocol.com',
+    providerUri: 'https://provider.rinkeby.solbodyprotocol.com',
+    subgraphUri: 'https://subgraph.rinkeby.solbodyprotocol.com',
     explorerUri: 'https://rinkeby.etherscan.io',
     startBlock: 7294090
   },
@@ -76,8 +76,8 @@ export const configHelperNetworks: ConfigHelperConfig[] = [
     networkId: 1,
     network: 'mainnet',
     nodeUri: 'https://mainnet.infura.io/v3',
-    providerUri: 'https://provider.mainnet.oceanprotocol.com',
-    subgraphUri: 'https://subgraph.mainnet.oceanprotocol.com',
+    providerUri: 'https://provider.mainnet.solbodyprotocol.com',
+    subgraphUri: 'https://subgraph.mainnet.solbodyprotocol.com',
     explorerUri: 'https://etherscan.io',
     startBlock: 11105459,
     transactionBlockTimeout: 150,
@@ -90,10 +90,10 @@ export const configHelperNetworks: ConfigHelperConfig[] = [
     networkId: 137,
     network: 'polygon',
     nodeUri: 'https://polygon-mainnet.infura.io/v3',
-    providerUri: 'https://provider.polygon.oceanprotocol.com',
-    subgraphUri: 'https://subgraph.polygon.oceanprotocol.com',
+    providerUri: 'https://provider.polygon.solbodyprotocol.com',
+    subgraphUri: 'https://subgraph.polygon.solbodyprotocol.com',
     explorerUri: 'https://polygonscan.com',
-    oceanTokenSymbol: 'mOCEAN',
+    solbodyTokenSymbol: 'mSOLBODY',
     startBlock: 11005222,
     gasFeeMultiplier: 1.05
   },
@@ -102,8 +102,8 @@ export const configHelperNetworks: ConfigHelperConfig[] = [
     networkId: 1287,
     network: 'moonbeamalpha',
     nodeUri: 'https://rpc.testnet.moonbeam.network',
-    providerUri: 'https://provider.moonbeamalpha.oceanprotocol.com',
-    subgraphUri: 'https://subgraph.moonbeamalpha.oceanprotocol.com',
+    providerUri: 'https://provider.moonbeamalpha.solbodyprotocol.com',
+    subgraphUri: 'https://subgraph.moonbeamalpha.solbodyprotocol.com',
     explorerUri: 'https://moonbase-blockscout.testnet.moonbeam.network/',
     startBlock: 90707
   },
@@ -111,28 +111,28 @@ export const configHelperNetworks: ConfigHelperConfig[] = [
     ...configHelperNetworksBase,
     networkId: 2021000,
     network: 'gaiaxtestnet',
-    nodeUri: 'https://rpc.gaiaxtestnet.oceanprotocol.com',
-    providerUri: 'https://provider.gaiaxtestnet.oceanprotocol.com',
-    subgraphUri: 'https://subgraph.gaiaxtestnet.oceanprotocol.com',
-    explorerUri: 'https://blockscout.gaiaxtestnet.oceanprotocol.com'
+    nodeUri: 'https://rpc.gaiaxtestnet.solbodyprotocol.com',
+    providerUri: 'https://provider.gaiaxtestnet.solbodyprotocol.com',
+    subgraphUri: 'https://subgraph.gaiaxtestnet.solbodyprotocol.com',
+    explorerUri: 'https://blockscout.gaiaxtestnet.solbodyprotocol.com'
   },
   {
     ...configHelperNetworksBase,
     networkId: 2021001,
     network: 'catenaxtestnet',
-    nodeUri: 'https://rpc.catenaxtestnet.oceanprotocol.com',
-    providerUri: 'https://provider.catenaxtestnet.oceanprotocol.com',
-    subgraphUri: 'https://subgraph.catenaxtestnet.oceanprotocol.com',
-    explorerUri: 'https://blockscout.catenaxtestnet.oceanprotocol.com',
-    metadataCacheUri: 'https://aquarius.catenaxtestnet.oceanprotocol.com'
+    nodeUri: 'https://rpc.catenaxtestnet.solbodyprotocol.com',
+    providerUri: 'https://provider.catenaxtestnet.solbodyprotocol.com',
+    subgraphUri: 'https://subgraph.catenaxtestnet.solbodyprotocol.com',
+    explorerUri: 'https://blockscout.catenaxtestnet.solbodyprotocol.com',
+    metadataCacheUri: 'https://aquarius.catenaxtestnet.solbodyprotocol.com'
   },
   {
     ...configHelperNetworksBase,
     networkId: 80001,
     network: 'mumbai',
     nodeUri: 'https://polygon-mumbai.infura.io/v3',
-    providerUri: 'https://provider.mumbai.oceanprotocol.com',
-    subgraphUri: 'https://subgraph.mumbai.oceanprotocol.com',
+    providerUri: 'https://provider.mumbai.solbodyprotocol.com',
+    subgraphUri: 'https://subgraph.mumbai.solbodyprotocol.com',
     explorerUri: 'https://mumbai.polygonscan.com'
   },
   {
@@ -140,8 +140,8 @@ export const configHelperNetworks: ConfigHelperConfig[] = [
     networkId: 56,
     network: 'bsc',
     nodeUri: 'https://bsc-dataseed.binance.org',
-    providerUri: 'https://provider.bsc.oceanprotocol.com',
-    subgraphUri: 'https://subgraph.bsc.oceanprotocol.com',
+    providerUri: 'https://provider.bsc.solbodyprotocol.com',
+    subgraphUri: 'https://subgraph.bsc.solbodyprotocol.com',
     explorerUri: 'https://bscscan.com/',
     gasFeeMultiplier: 1.05
   },
@@ -150,8 +150,8 @@ export const configHelperNetworks: ConfigHelperConfig[] = [
     networkId: 44787,
     network: 'celoalfajores',
     nodeUri: 'https://alfajores-forno.celo-testnet.org',
-    providerUri: 'https://provider.celoalfajores.oceanprotocol.com',
-    subgraphUri: 'https://subgraph.celoalfajores.oceanprotocol.com',
+    providerUri: 'https://provider.celoalfajores.solbodyprotocol.com',
+    subgraphUri: 'https://subgraph.celoalfajores.solbodyprotocol.com',
     explorerUri: 'https://alfajores-blockscout.celo-testnet.org'
   },
   {
@@ -159,8 +159,8 @@ export const configHelperNetworks: ConfigHelperConfig[] = [
     networkId: 246,
     network: 'energyweb',
     nodeUri: 'https://rpc.energyweb.org',
-    providerUri: 'https://provider.energyweb.oceanprotocol.com',
-    subgraphUri: 'https://subgraph.energyweb.oceanprotocol.com',
+    providerUri: 'https://provider.energyweb.solbodyprotocol.com',
+    subgraphUri: 'https://subgraph.energyweb.solbodyprotocol.com',
     explorerUri: 'https://explorer.energyweb.org',
     gasFeeMultiplier: 1.05
   },
@@ -169,15 +169,15 @@ export const configHelperNetworks: ConfigHelperConfig[] = [
     networkId: 1285,
     network: 'moonriver',
     nodeUri: 'https://moonriver.api.onfinality.io/public',
-    providerUri: 'https://provider.moonriver.oceanprotocol.com',
-    subgraphUri: 'https://subgraph.moonriver.oceanprotocol.com',
+    providerUri: 'https://provider.moonriver.solbodyprotocol.com',
+    subgraphUri: 'https://subgraph.moonriver.solbodyprotocol.com',
     explorerUri: 'https://blockscout.moonriver.moonbeam.network',
     gasFeeMultiplier: 1.05
   }
 ]
 
 export class ConfigHelper {
-  /* Load contract addresses from env ADDRESS_FILE (generated by ocean-contracts) */
+  /* Load contract addresses from env ADDRESS_FILE (generated by solbody-contracts) */
   public getAddressesFromEnv(network: string): Partial<ConfigHelperConfig> {
     // use the defaults first
     let configAddresses: Partial<ConfigHelperConfig>
@@ -188,7 +188,7 @@ export class ConfigHelper {
         FixedRateExchange,
         Dispenser,
         Metadata,
-        Ocean,
+        Solbody,
         chainId,
         startBlock
       } = DefaultContractsAddresses[network]
@@ -198,7 +198,7 @@ export class ConfigHelper {
         fixedRateExchangeAddress: FixedRateExchange,
         dispenserAddress: Dispenser,
         metadataContractAddress: Metadata,
-        oceanTokenAddress: Ocean,
+        solbodyTokenAddress: Solbody,
         networkId: chainId,
         startBlock: startBlock,
         ...(process.env.AQUARIUS_URI && { metadataCacheUri: process.env.AQUARIUS_URI })
@@ -210,7 +210,7 @@ export class ConfigHelper {
         const data = JSON.parse(
           fs.readFileSync(
             process.env.ADDRESS_FILE ||
-              `${homedir}/.ocean/ocean-contracts/artifacts/address.json`,
+              `${homedir}/.solbody/solbody-contracts/artifacts/address.json`,
             'utf8'
           )
         )
@@ -220,7 +220,7 @@ export class ConfigHelper {
           FixedRateExchange,
           Dispenser,
           Metadata,
-          Ocean,
+          Solbody,
           chainId,
           startBlock
         } = data[network]
@@ -230,7 +230,7 @@ export class ConfigHelper {
           fixedRateExchangeAddress: FixedRateExchange,
           dispenserAddress: Dispenser,
           metadataContractAddress: Metadata,
-          oceanTokenAddress: Ocean,
+          solbodyTokenAddress: Solbody,
           networkId: chainId,
           startBlock: startBlock,
           ...(process.env.AQUARIUS_URI && { metadataCacheUri: process.env.AQUARIUS_URI })
