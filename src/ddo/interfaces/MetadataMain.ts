@@ -1,10 +1,6 @@
 import { MetadataAlgorithm } from './MetadataAlgorithm'
 import { File } from './File'
 
-/**
- * Main attributes of assets metadata.
- * @see https://github.com/oceanprotocol/OEPs/tree/master/8
- */
 export interface MetadataMain {
   /**
    * Descriptive name of the Asset.
