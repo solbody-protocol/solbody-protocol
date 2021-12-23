@@ -41,10 +41,10 @@ const generateJson = async () => {
 
   const jsonFinal = {
     info: {
-      title: 'Ocean.js',
+      title: 'Solbody.js',
       description,
       version,
-      sourceUrl: 'https://github.com/oceanprotocol/ocean.js/blob/main/'
+      sourceUrl: 'https://github.com/solbodyprotocol/solbody.js/blob/main/'
     },
     ...jsonOrig
   }
