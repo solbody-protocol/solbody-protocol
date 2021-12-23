@@ -3,8 +3,8 @@ import { AbiItem } from 'web3-utils/types'
 import { TransactionReceipt } from 'web3-core'
 import { Logger, getFairGasPrice, setContractDefaults } from '../utils'
 import BigNumber from 'bignumber.js'
-import jsonpoolABI from '@oceanprotocol/contracts/artifacts/BPool.json'
-import defaultDatatokensABI from '@oceanprotocol/contracts/artifacts/DataTokenTemplate.json'
+import jsonpoolABI from '@solbodyprotocol/contracts/artifacts/BPool.json'
+import defaultDatatokensABI from '@solbodyprotocol/contracts/artifacts/DataTokenTemplate.json'
 import { PoolFactory } from './PoolFactory'
 import Decimal from 'decimal.js'
 import { ConfigHelperConfig } from '../utils/ConfigHelper'
@@ -115,7 +115,7 @@ export class Pool extends PoolFactory {
   }
 
   /**
-   * Get Alloance for both DataToken and Ocean
+   * Get Alloance for both DataToken and Solbody
    * @param {String } tokenAdress
    * @param {String} owner
    * @param {String} spender
