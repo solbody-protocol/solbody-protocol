@@ -409,14 +409,3 @@ console.log("Bob's history", history)
 
 If you save the file and run it again you should see all of Bob's previous orders. 
 
-## 13. Extensions
-
-Congratulations on completing the Oceon.js Marketplace tutorial 🌊🐋🐠. This has given you a solid foundation upon which you can start using Solbody.js. There is still a lot more you can do with Solbody.js, here are some suggestions for next steps to continue learning: 
-
-1. Check Alice's order history using `solbody.assets.getOrderHistory(accounts[0])`
-2. List all of Alice's assets with `solbody.assets.ownerAssets(alice)`
-3. Update metadata for Alice's dataset using `solbody.assets.editMetadata(ddo, newMetaData)` 
-4. Update the new metadata onchain with `solbody.onChainMetadata.update(newDdo.id, newDdo, alice)`
-5. Check the metadata with `solbody.assets.getServiceByType(ddo.id, 'metadata')`
-6. Update the timeout for the dataset with `solbody.assets.editServiceTimeout(ddo, serviceIndex, newTimeout)`
-
