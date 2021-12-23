@@ -1,7 +1,7 @@
 import Config from './models/Config'
-import Account from './ocean/Account'
-import DID from './ocean/DID'
-import { Ocean } from './ocean/Ocean'
+import Account from './solbody/Account'
+import DID from './solbody/DID'
+import { Solbody } from './solbody/Solbody'
 import { LoggerInstance as Logger, LogLevel } from './utils/Logger'
 import { MetadataCache } from './metadatacache/MetadataCache'
 import { DataTokens } from './datatokens/Datatokens'
@@ -14,16 +14,16 @@ import { Provider } from './provider/Provider'
 export * from './ddo/DDO'
 export * from './ddo/interfaces'
 
-export { CreateProgressStep, OrderProgressStep } from './ocean/Assets'
+export { CreateProgressStep, OrderProgressStep } from './solbody/Assets'
 
 export {
-  OceanPlatformTechStatus,
-  OceanPlatformTech,
-  OceanPlatformVersions
-} from './ocean/Versions'
+  SolbodyPlatformTechStatus,
+  SolbodyPlatformTech,
+  SolbodyPlatformVersions
+} from './solbody/Versions'
 
 export {
-  Ocean,
+  Solbody,
   Account,
   Config,
   DID,
