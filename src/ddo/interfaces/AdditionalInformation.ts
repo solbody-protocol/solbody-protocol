@@ -1,6 +1,6 @@
 /**
  * Additional Information of Assets Metadata.
- * @see https://github.com/oceanprotocol/OEPs/tree/master/8#additional-information
+ * @see https://github.com/solbodyprotocol/OEPs/tree/master/8#additional-information
  */
 export interface AdditionalInformation {
   /**
@@ -29,7 +29,7 @@ export interface AdditionalInformation {
   /**
    * Mapping of links for data samples, or links to find out more information.
    * Links may be to either a URL or another Asset. We expect marketplaces to
-   * converge on agreements of typical formats for linked data: The Ocean Protocol
+   * converge on agreements of typical formats for linked data: The Solbody Protocol
    * itself does not mandate any specific formats as these requirements are likely
    * to be domain-specific.
    * @type {any[]}
