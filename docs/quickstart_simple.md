@@ -17,20 +17,20 @@ Let's go through each of these in detail.
 
 ## 1. Initialize services
 
-We start by initializing the services. To do this, we clone the Barge repository and run it. This will run the current default versions of [Aquarius](https://github.com/oceanprotocol/aquarius), [Provider](https://github.com/oceanprotocol/provider-py), and [Ganache](https://github.com/trufflesuite/ganache-cli) with [our contracts](https://github.com/oceanprotocol/ocean-contracts) deployed to it.
+We start by initializing the services. To do this, we clone the Barge repository and run it. This will run the current default versions of [Aquarius](https://github.com/solbodyprotocol/aquarius), [Provider](https://github.com/solbodyprotocol/provider-py), and [Ganache](https://github.com/trufflesuite/ganache-cli) with [our contracts](https://github.com/solbodyprotocol/solbody-contracts) deployed to it.
 
 ```bash
-git clone https://github.com/oceanprotocol/barge.git
+git clone https://github.com/solbodyprotocol/barge.git
 cd barge/
-./start_ocean.sh --with-provider2 --no-dashboard
+./start_solbody.sh --with-provider2 --no-dashboard
 ```
 ## 2. Create a new node.js project
 
 Start by creating a new Node.js project. Open a new terminal and enter the following commands: 
 
 ```bash
-mkdir ocean-quickstart
-cd ocean-quickstart
+mkdir solbody-quickstart
+cd solbody-quickstart
 npm init
 # Answer the questions in the command line prompt
 cat > index.js
@@ -43,8 +43,8 @@ Open the package.json file in a text editor and update the dependencies to inclu
 
 ```JSON
   "dependencies": {
-    "@oceanprotocol/contracts": "^0.5.6",
-    "@oceanprotocol/lib": "^0.6.5",
+    "@solbodyprotocol/contracts": "^0.5.6",
+    "@solbodyprotocol/lib": "^0.6.5",
     "web3": "^1.3.0"
   }
 ```
@@ -66,7 +66,7 @@ cat > config.js
 Now open the config.js in your code editor and enter the following:
 
 ```Javascript
-const { ConfigHelper } = require("@oceanprotocol/lib");
+const { ConfigHelper } = require("@solbodyprotocol/lib");
 const Web3 = require("web3");
 const defaultConfig = new ConfigHelper().getConfig("development");
 
@@ -81,7 +81,7 @@ const contracts = {
   "BFactory": "0x_YOUR_DTFactory_ADDRESS_",
   "FixedRateExchange": "0x_YOUR_DTFactory_ADDRESS_",
   "Metadata": "0x_YOUR_Metadata_ADDRESS_",
-  "Ocean": "0x_YOUR_Ocean_ADDRESS_"
+  "Solbody": "0x_YOUR_Solbody_ADDRESS_"
 };
 
 const config = {
@@ -102,7 +102,7 @@ module.exports = {
 Now check what your contract addresses are locally. In your terminal run:
 
 ```bash
-cat ~/.ocean/ocean-contracts/artifacts/address.json
+cat ~/.solbody/solbody-contracts/artifacts/address.json
 ```
 
 Next, update the contract addresses in your config.js file. Replace each of the place holders with the actual addresses that were outputted into your terminal. 
@@ -112,19 +112,19 @@ Now open the `index.js` file in your text editor. Enter the following code and s
 
 ```Javascript
 const Web3 = require("web3");
-const { Ocean, DataTokens } = require("@oceanprotocol/lib");
+const { Solbody, DataTokens } = require("@solbodyprotocol/lib");
 
-const factoryABI = require("@oceanprotocol/contracts/artifacts/DTFactory.json").abi;
-const datatokensABI = require("@oceanprotocol/contracts/artifacts/DataTokenTemplate.json").abi;
+const factoryABI = require("@solbodyprotocol/contracts/artifacts/DTFactory.json").abi;
+const datatokensABI = require("@solbodyprotocol/contracts/artifacts/DataTokenTemplate.json").abi;
 const { config, contracts, urls } = require("./config");
 
 
 
 const init = async () => {
-  const ocean = await Ocean.getInstance(config);
+  const solbody = await Solbody.getInstance(config);
   const blob = `http://localhost:8030/api/v1/services/consume`;
 
-  const accounts = await ocean.accounts.list();
+  const accounts = await solbody.accounts.list();
   const alice = accounts[0].id;
   console.log('Alice account address:', alice)
 
@@ -147,7 +147,7 @@ Now in your terminal, run the following command:
 node index.js
 ```
 
-Congratulations, you've created your first Ocean datatoken! 🌊🐋
+Congratulations, you've created your first Solbody datatoken! 🌊🐋
 
 ## 6. Mint 100 tokens
 
@@ -240,7 +240,7 @@ const { testData } = require("./data");
 At the end of the `init() { ... }` function (after `console.log('Bob token balance:', bobBalance)`) add the following code:
 
 ```Javascript
-  dataService = await ocean.assets.createAccessServiceAttributes(
+  dataService = await solbody.assets.createAccessServiceAttributes(
     accounts[0],
     10, // set the price in datatoken
     new Date(Date.now()).toISOString().split(".")[0] + "Z", // publishedDate
@@ -248,7 +248,7 @@ At the end of the `init() { ... }` function (after `console.log('Bob token balan
   );
 
   // publish asset
-  const createData = await ocean.assets.create(
+  const createData = await solbody.assets.create(
     testData,
     accounts[0],
     [dataService],
@@ -267,4 +267,4 @@ node index.js
 
 In the terminal output you should now see the Data ID (did) outputed.  
 
-Congratulations, you have published your first dataset! 🌊🐠🐡 Now you are ready for the [marketplace flow](docs/quickstart_marketplace.md). 
+Congratulations, you have published your first dataset! 🌊🐠🐡 Now you are ready for the [marketplace flow](docs/quickstart_marketplace.md).
