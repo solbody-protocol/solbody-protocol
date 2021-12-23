@@ -1,16 +1,16 @@
 <!--
-Copyright 2021 Ocean Protocol Foundation
+Copyright 2021 Solbody Protocol Foundation
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# About Ocean off-chain services
+# About Solbody off-chain services
 
 ## Introduction
 
-Ocean uses these off-chain services:
+Solbody uses these off-chain services:
 
--   [Ocean Provider](https://github.com/oceanprotocol/provider) is for data services. Specifically, it's a REST API serving requests for two types of data services: static urls (for downloading data) and compute services. It's run by the marketplace or the data publisher.
--   [Ocean Aquarius](https://github.com/oceanprotocol/aquarius) is metadata cache REST API. This helps to aid search in marketplaces.
+-   [Solbody Provider](https://github.com/solbodyprotocol/provider) is for data services. Specifically, it's a REST API serving requests for two types of data services: static urls (for downloading data) and compute services. It's run by the marketplace or the data publisher.
+-   [Solbody Aquarius](https://github.com/solbodyprotocol/aquarius) is metadata cache REST API. This helps to aid search in marketplaces.
 
 We now describe how to use these.
 
@@ -24,8 +24,8 @@ In your working directory, create a file `config.ini` and fill it with the follo
     network = https://rinkeby.infura.io/v3/<your Infura project id>
 
     [resources]
-    aquarius.url = AQUARIUS_URL=https://aquarius.rinkeby.oceanprotocol.com
-    provider.url = PROVIDER_URL=https://provider.rinkeby.oceanprotocol.com
+    aquarius.url = AQUARIUS_URL=https://aquarius.rinkeby.solbodyprotocol.com
+    provider.url = PROVIDER_URL=https://provider.rinkeby.solbodyprotocol.com
 
 Ensure that envvars don't override the config file values:
 
@@ -66,7 +66,7 @@ Above, we described a specific flow to go through configuring services. Here are
 
 ### Point to services in other networks
 
-The service urls above are for rinkeby. [Ocean's docs have urls](https://docs.oceanprotocol.com/concepts/networks) for Ethereum mainnet and other supported networks.
+The service urls above are for rinkeby. [Solbody's docs have urls](https://docs.solbodyprotocol.com/concepts/networks) for Ethereum mainnet and other supported networks.
 
 ### Run your own services, separately
 
@@ -75,13 +75,13 @@ Above, we pointed to existing services. Alternatively, you can run your own. Her
 Open a new console, and get provider running:
 
 ```console
-docker run oceanprotocol/provider:latest
+docker run solbodyprotocol/provider:latest
 ```
 
 Open another new console, and get aquarius running:
 
 ```console
-docker run oceanprotocol/aquarius:latest
+docker run solbodyprotocol/aquarius:latest
 ```
 
 Here are the urls for the local services, for use in `config.ini` etc.
@@ -91,4 +91,4 @@ Here are the urls for the local services, for use in `config.ini` etc.
 
 ### Run your own services, all at once
 
-Above, we ran all services separately. You can also run [Ocean Barge](https://github.com/oceanprotocol/barge) to conveniently run them all at once.
+Above, we ran all services separately. You can also run [Solbody Barge](https://github.com/solbodyprotocol/barge) to conveniently run them all at once.
