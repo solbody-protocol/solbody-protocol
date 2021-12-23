@@ -39,10 +39,10 @@ export class Config {
   public web3Provider?: any
 
   /**
-   * Ocean Token address
+   * Solbody Token address
    * @type {string}
    */
-  public oceanTokenAddress?: string
+  public SolbodyTokenAddress?: string
 
   /**
    * Factory address
