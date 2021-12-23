@@ -33,7 +33,7 @@ export interface PoolShare {
 
 export interface TokensReceived {
   dtAmount: string
-  oceanAmount: string
+  solbodyAmount: string
 }
 
 export interface PoolTransaction {
@@ -53,15 +53,15 @@ export interface PoolTransaction {
 export enum PoolCreateProgressStep {
   CreatingPool,
   ApprovingDatatoken,
-  ApprovingOcean,
+  ApprovingSolbody,
   SetupPool
 }
 
 /**
- * Ocean Pools submodule exposed under ocean.pool
+ * Solbody Pools submodule exposed under solbody.pool
  */
-export class OceanPool extends Pool {
-  public oceanAddress: string = null
+export class SolbodyPool extends Pool {
+  public solbodyAddress: string = null
   public dtAddress: string = null
   public startBlock: number
 
@@ -71,12 +71,12 @@ export class OceanPool extends Pool {
     factoryABI: AbiItem | AbiItem[] = null,
     poolABI: AbiItem | AbiItem[] = null,
     factoryAddress: string = null,
-    oceanAddress: string = null,
+    solbodyAddress: string = null,
     config?: ConfigHelperConfig
   ) {
     super(web3, logger, factoryABI, poolABI, factoryAddress, config)
-    if (oceanAddress) {
-      this.oceanAddress = oceanAddress
+    if (solbodyAddress) {
+      this.solbodyAddress = solbodyAddress
     }
     this.startBlock = (config && config.startBlock) || 0
   }
@@ -87,7 +87,7 @@ export class OceanPool extends Pool {
      * @param {String} dtAddress  DataToken address
      * @param {String} dtAmount DataToken amount
      * @param {String} dtWeight DataToken weight
-     * @param {String} oceanAmount Ocean amount
+     * @param {String} solbodyAmount Solbody amount
      * @param {String} fee Swap fee. E.g. to get a 0.1% swapFee use `0.001`. The maximum allowed swapFee is `0.1` (10%).
      * @return {String}
      */
@@ -96,12 +96,12 @@ export class OceanPool extends Pool {
     dtAddress: string,
     dtAmount: string,
     dtWeight: string,
-    oceanAmount: string,
+    solbodyAmount: string,
     fee: string
   ): SubscribablePromise<PoolCreateProgressStep, TransactionReceipt> {
-    if (this.oceanAddress == null) {
-      this.logger.error('ERROR: oceanAddress is not defined')
-      throw new Error('ERROR: oceanAddress is not defined')
+    if (this.solbodyAddress == null) {
+      this.logger.error('ERROR: solbodyAddress is not defined')
+      throw new Error('ERROR: solbodyAddress is not defined')
     }
     if (parseFloat(fee) > 0.1) {
       this.logger.error('ERROR: Swap fee too high. The maximum allowed swapFee is 10%')
@@ -123,7 +123,7 @@ export class OceanPool extends Pool {
         throw new Error('ERROR: Failed to call create pool')
       }
       const address = createTxid.events.BPoolRegistered.returnValues[0]
-      const oceanWeight = 10 - parseFloat(dtWeight)
+      const solbodyWeight = 10 - parseFloat(dtWeight)
       this.dtAddress = dtAddress
       let txid
 
@@ -139,16 +139,16 @@ export class OceanPool extends Pool {
         throw new Error('ERROR: Failed to call approve DT token')
       }
 
-      observer.next(PoolCreateProgressStep.ApprovingOcean)
+      observer.next(PoolCreateProgressStep.ApprovingSolbody)
       txid = await this.approve(
         account,
-        this.oceanAddress,
+        this.solbodyAddress,
         address,
-        this.web3.utils.toWei(String(oceanAmount))
+        this.web3.utils.toWei(String(solbodyAmount))
       )
       if (!txid) {
-        this.logger.error('ERROR: Failed to call approve OCEAN token')
-        throw new Error('ERROR: Failed to call approve OCEAN token')
+        this.logger.error('ERROR: Failed to call approve SOLBODY token')
+        throw new Error('ERROR: Failed to call approve SOLBODY token')
       }
 
       observer.next(PoolCreateProgressStep.SetupPool)
@@ -158,9 +158,9 @@ export class OceanPool extends Pool {
         dtAddress,
         this.web3.utils.toWei(String(dtAmount)),
         this.web3.utils.toWei(String(dtWeight)),
-        this.oceanAddress,
-        this.web3.utils.toWei(String(oceanAmount)),
-        this.web3.utils.toWei(String(oceanWeight)),
+        this.solbodyAddress,
+        this.web3.utils.toWei(String(solbodyAmount)),
+        this.web3.utils.toWei(String(solbodyWeight)),
         this.web3.utils.toWei(fee)
       )
       if (!txid) {
@@ -185,23 +185,23 @@ export class OceanPool extends Pool {
     if (tokens != null)
       for (token of tokens) {
         // TODO: Potential timing attack, left side: true
-        if (token.toLowerCase() !== this.oceanAddress.toLowerCase())
+        if (token.toLowerCase() !== this.solbodyAddress.toLowerCase())
           this.dtAddress = token
       }
     return this.dtAddress
   }
 
   /**
-   * Get Ocean Token balance of a pool
+   * Get Solbody Token balance of a pool
    * @param {String} poolAddress
    * @return {String}
    */
-  public async getOceanReserve(poolAddress: string): Promise<string> {
-    if (this.oceanAddress == null) {
-      this.logger.error('ERROR: oceanAddress is not defined')
+  public async getSolbodyReserve(poolAddress: string): Promise<string> {
+    if (this.solbodyAddress == null) {
+      this.logger.error('ERROR: solbodyAddress is not defined')
       return null
     }
-    return super.getReserve(poolAddress, this.oceanAddress)
+    return super.getReserve(poolAddress, this.solbodyAddress)
   }
 
   /**
@@ -228,12 +228,12 @@ export class OceanPool extends Pool {
   }
 
   /**
-   * Returns max amount of OCEAN that you can buy.
+   * Returns max amount of SOLBODY that you can buy.
    * @param poolAddress
    * @param tokenAddress
    */
-  public async getOceanMaxBuyQuantity(poolAddress: string): Promise<string> {
-    return this.getMaxBuyQuantity(poolAddress, this.oceanAddress)
+  public async getSolbodyMaxBuyQuantity(poolAddress: string): Promise<string> {
+    return this.getMaxBuyQuantity(poolAddress, this.solbodyAddress)
   }
 
   /**
@@ -420,27 +420,27 @@ export class OceanPool extends Pool {
    * @param poolAddress
    * @param dtAmount
    */
-  public async getPoolSharesRequiredToRemoveOcean(
+  public async getPoolSharesRequiredToRemoveSolbody(
     poolAddress: string,
-    oceanAmount: string
+    solbodyAmount: string
   ): Promise<string> {
-    return this.calcPoolInGivenSingleOut(poolAddress, this.oceanAddress, oceanAmount)
+    return this.calcPoolInGivenSingleOut(poolAddress, this.solbodyAddress, solbodyAmount)
   }
 
   /**
-   * Returns Ocean amnount received after spending poolShares
+   * Returns Solbody amnount received after spending poolShares
    * @param poolAddress
    * @param poolShares
    */
-  public async getOceanRemovedforPoolShares(
+  public async getSolbodyRemovedforPoolShares(
     poolAddress: string,
     poolShares: string
   ): Promise<string> {
-    return this.calcSingleOutGivenPoolIn(poolAddress, this.oceanAddress, poolShares)
+    return this.calcSingleOutGivenPoolIn(poolAddress, this.solbodyAddress, poolShares)
   }
 
   /**
-   * Returns Datatoken & Ocean amounts received after spending poolShares
+   * Returns Datatoken & Solbody amounts received after spending poolShares
    * @param {String} poolAddress
    * @param {String} poolShares
    * @return {TokensReceived}
@@ -452,16 +452,16 @@ export class OceanPool extends Pool {
     try {
       const totalPoolTokens = await this.getPoolSharesTotalSupply(poolAddress)
       const dtReserve = await this.getDTReserve(poolAddress)
-      const oceanReserve = await this.getOceanReserve(poolAddress)
+      const solbodyReserve = await this.getSolbodyReserve(poolAddress)
       const dtAmount = new Decimal(poolShares)
         .div(totalPoolTokens)
         .mul(dtReserve)
         .toString()
-      const oceanAmount = new Decimal(poolShares)
+      const solbodyAmount = new Decimal(poolShares)
         .div(totalPoolTokens)
-        .mul(oceanReserve)
+        .mul(solbodyReserve)
         .toString()
-      return { dtAmount, oceanAmount }
+      return { dtAmount, solbodyAmount }
     } catch (e) {
       this.logger.error(`ERROR: Unable to get token info. ${e.message}`)
     }
@@ -477,11 +477,11 @@ export class OceanPool extends Pool {
   }
 
   /**
-   * Returns max Ocean amount that you can add to the pool
+   * Returns max Solbody amount that you can add to the pool
    * @param poolAddress
    */
-  public async getOceanMaxAddLiquidity(poolAddress: string): Promise<string> {
-    return this.getMaxAddLiquidity(poolAddress, this.oceanAddress)
+  public async getSolbodyMaxAddLiquidity(poolAddress: string): Promise<string> {
+    return this.getMaxAddLiquidity(poolAddress, this.solbodyAddress)
   }
 
   /**
@@ -525,12 +525,12 @@ export class OceanPool extends Pool {
   }
 
   /**
-   * Returns max amount of Ocean that you can withdraw from the pool
+   * Returns max amount of Solbody that you can withdraw from the pool
    * @param poolAddress
    * @param tokenAddress
    */
-  public async getOceanMaxRemoveLiquidity(poolAddress: string): Promise<string> {
-    return this.getMaxRemoveLiquidity(poolAddress, this.oceanAddress)
+  public async getSolbodyMaxRemoveLiquidity(poolAddress: string): Promise<string> {
+    return this.getMaxRemoveLiquidity(poolAddress, this.solbodyAddress)
   }
 
   /**
@@ -538,7 +538,7 @@ export class OceanPool extends Pool {
    * @param {String} account
    * @param {String} poolAddress
    * @param {String} amount  datatoken amount
-   * @param {String} oceanAmount  Ocean Token amount payed
+   * @param {String} solbodyAmount  Solbody Token amount payed
    * @param {String} maxPrice  Maximum price to pay
    * @return {TransactionReceipt}
    */
@@ -546,11 +546,11 @@ export class OceanPool extends Pool {
     account: string,
     poolAddress: string,
     dtAmountWanted: string,
-    maxOceanAmount: string,
+    maxSolbodyAmount: string,
     maxPrice?: string
   ): Promise<TransactionReceipt> {
-    if (this.oceanAddress == null) {
-      this.logger.error('ERROR: undefined ocean token contract address')
+    if (this.solbodyAddress == null) {
+      this.logger.error('ERROR: undefined solbody token contract address')
       return null
     }
     const dtAddress = await this.getDTAddress(poolAddress)
@@ -560,28 +560,28 @@ export class OceanPool extends Pool {
       this.logger.error('ERROR: Buy quantity exceeds quantity allowed')
       return null
     }
-    const calcInGivenOut = await this.getOceanNeeded(poolAddress, dtAmountWanted)
-    if (new Decimal(calcInGivenOut).greaterThan(maxOceanAmount)) {
-      this.logger.error('ERROR: Not enough Ocean Tokens')
+    const calcInGivenOut = await this.getSolbodyNeeded(poolAddress, dtAmountWanted)
+    if (new Decimal(calcInGivenOut).greaterThan(maxSolbodyAmount)) {
+      this.logger.error('ERROR: Not enough Solbody Tokens')
       return null
     }
 
     const txid = await super.approve(
       account,
-      this.oceanAddress,
+      this.solbodyAddress,
       poolAddress,
-      this.web3.utils.toWei(maxOceanAmount)
+      this.web3.utils.toWei(maxSolbodyAmount)
     )
     if (!txid) {
-      this.logger.error('ERROR: Failed to call approve OCEAN token')
-      throw new Error('ERROR: Failed to call approve OCEAN token')
+      this.logger.error('ERROR: Failed to call approve SOLBODY token')
+      throw new Error('ERROR: Failed to call approve SOLBODY token')
     }
 
     const tx = await super.swapExactAmountOut(
       account,
       poolAddress,
-      this.oceanAddress,
-      maxOceanAmount,
+      this.solbodyAddress,
+      maxSolbodyAmount,
       dtAddress,
       dtAmountWanted,
       maxPrice
@@ -590,23 +590,23 @@ export class OceanPool extends Pool {
   }
 
   /**
-   * Buy at least datatoken from a pool for a fixed Ocean amount
+   * Buy at least datatoken from a pool for a fixed Solbody amount
    * @param {String} account
    * @param {String} poolAddress
    * @param {String} amount  datatoken amount
-   * @param {String} oceanAmount  Ocean Token amount payed
+   * @param {String} solbodyAmount  Solbody Token amount payed
    * @param {String} maxPrice  Maximum price to pay
    * @return {TransactionReceipt}
    */
-  public async buyDTWithExactOcean(
+  public async buyDTWithExactSolbody(
     account: string,
     poolAddress: string,
     minimumdtAmountWanted: string,
-    oceanAmount: string,
+    solbodyAmount: string,
     maxPrice?: string
   ): Promise<TransactionReceipt> {
-    if (this.oceanAddress == null) {
-      this.logger.error('ERROR: undefined ocean token contract address')
+    if (this.solbodyAddress == null) {
+      this.logger.error('ERROR: undefined solbody token contract address')
       return null
     }
     const dtAddress = await this.getDTAddress(poolAddress)
@@ -618,28 +618,28 @@ export class OceanPool extends Pool {
       this.logger.error('ERROR: Buy quantity exceeds quantity allowed')
       return null
     }
-    const calcInGivenOut = await this.getOceanNeeded(poolAddress, minimumdtAmountWanted)
-    if (new Decimal(calcInGivenOut).greaterThan(oceanAmount)) {
-      this.logger.error('ERROR: Not enough Ocean Tokens')
+    const calcInGivenOut = await this.getSolbodyNeeded(poolAddress, minimumdtAmountWanted)
+    if (new Decimal(calcInGivenOut).greaterThan(solbodyAmount)) {
+      this.logger.error('ERROR: Not enough Solbody Tokens')
       return null
     }
 
     const txid = await super.approve(
       account,
-      this.oceanAddress,
+      this.solbodyAddress,
       poolAddress,
-      this.web3.utils.toWei(oceanAmount)
+      this.web3.utils.toWei(solbodyAmount)
     )
     if (!txid) {
-      this.logger.error('ERROR: Failed to call approve OCEAN token')
-      throw new Error('ERROR: Failed to call approve OCEAN token')
+      this.logger.error('ERROR: Failed to call approve SOLBODY token')
+      throw new Error('ERROR: Failed to call approve SOLBODY token')
     }
 
     const tx = await super.swapExactAmountIn(
       account,
       poolAddress,
-      this.oceanAddress,
-      oceanAmount,
+      this.solbodyAddress,
+      solbodyAmount,
       dtAddress,
       minimumdtAmountWanted,
       maxPrice
@@ -648,11 +648,11 @@ export class OceanPool extends Pool {
   }
 
   /**
-   * Sell a specific amount of datatoken to get some ocean tokens
+   * Sell a specific amount of datatoken to get some solbody tokens
    * @param {String} account
    * @param {String} poolAddress
    * @param {String} amount  datatoken amount to be sold
-   * @param {String} oceanAmount  Ocean Token amount expected
+   * @param {String} solbodyAmount  Solbody Token amount expected
    * @param {String} maxPrice  Minimum price to sell
    * @return {TransactionReceipt}
    */
@@ -660,24 +660,24 @@ export class OceanPool extends Pool {
     account: string,
     poolAddress: string,
     dtAmount: string,
-    oceanAmountWanted: string,
+    solbodyAmountWanted: string,
     maxPrice?: string
   ): Promise<TransactionReceipt> {
-    if (this.oceanAddress == null) {
-      this.logger.error('ERROR: oceanAddress is not defined')
+    if (this.solbodyAddress == null) {
+      this.logger.error('ERROR: solbodyAddress is not defined')
       return null
     }
     const dtAddress = await this.getDTAddress(poolAddress)
     if (
-      new Decimal(oceanAmountWanted).greaterThan(
-        await this.getOceanMaxBuyQuantity(poolAddress)
+      new Decimal(solbodyAmountWanted).greaterThan(
+        await this.getSolbodyMaxBuyQuantity(poolAddress)
       )
     ) {
       this.logger.error('ERROR: Buy quantity exceeds quantity allowed')
       return null
     }
-    const calcOutGivenIn = await this.getOceanReceived(poolAddress, dtAmount)
-    if (new Decimal(calcOutGivenIn).lessThan(oceanAmountWanted)) {
+    const calcOutGivenIn = await this.getSolbodyReceived(poolAddress, dtAmount)
+    if (new Decimal(calcOutGivenIn).lessThan(solbodyAmountWanted)) {
       this.logger.error('ERROR: Not enough datatokens')
       return null
     }
@@ -698,8 +698,8 @@ export class OceanPool extends Pool {
       poolAddress,
       dtAddress,
       dtAmount,
-      this.oceanAddress,
-      oceanAmountWanted,
+      this.solbodyAddress,
+      solbodyAmountWanted,
       maxPrice
     )
     return tx
@@ -789,22 +789,22 @@ export class OceanPool extends Pool {
   }
 
   /**
-   * Add Ocean Token amount to pool liquidity
+   * Add Solbody Token amount to pool liquidity
    * @param {String} account
    * @param {String} poolAddress
-   * @param {String} amount Ocean Token amount in OCEAN
+   * @param {String} amount Solbody Token amount in SOLBODY
    * @return {TransactionReceipt}
    */
-  public async addOceanLiquidity(
+  public async addSolbodyLiquidity(
     account: string,
     poolAddress: string,
     amount: string
   ): Promise<TransactionReceipt> {
-    if (this.oceanAddress == null) {
-      this.logger.error('ERROR: oceanAddress is not defined')
+    if (this.solbodyAddress == null) {
+      this.logger.error('ERROR: solbodyAddress is not defined')
       return null
     }
-    const maxAmount = await this.getOceanMaxAddLiquidity(poolAddress)
+    const maxAmount = await this.getSolbodyMaxAddLiquidity(poolAddress)
     if (new Decimal(amount).greaterThan(maxAmount)) {
       this.logger.error('ERROR: Too much reserve to add')
       return null
@@ -812,19 +812,19 @@ export class OceanPool extends Pool {
 
     const txid = await super.approve(
       account,
-      this.oceanAddress,
+      this.solbodyAddress,
       poolAddress,
       this.web3.utils.toWei(amount)
     )
     if (!txid) {
-      this.logger.error('ERROR: Failed to call approve OCEAN token')
-      throw new Error('ERROR: Failed to call approve OCEAN token')
+      this.logger.error('ERROR: Failed to call approve SOLBODY token')
+      throw new Error('ERROR: Failed to call approve SOLBODY token')
     }
 
     const result = await super.joinswapExternAmountIn(
       account,
       poolAddress,
-      this.oceanAddress,
+      this.solbodyAddress,
       amount,
       '0'
     )
@@ -832,21 +832,21 @@ export class OceanPool extends Pool {
   }
 
   /**
-   * Remove Ocean Token amount from pool liquidity based on the minimum allowed of Ocean Tokens received
+   * Remove Solbody Token amount from pool liquidity based on the minimum allowed of Solbody Tokens received
    * @param {String} account
    * @param {String} poolAddress
    * @param {String} poolShares pool shares
-   * @param {String} minOcean minimum amount of OCEAN received
+   * @param {String} minSolbody minimum amount of SOLBODY received
    * @return {TransactionReceipt}
    */
-  public async removeOceanLiquidityWithMinimum(
+  public async removeSolbodyLiquidityWithMinimum(
     account: string,
     poolAddress: string,
     poolShares: string,
-    minOcean: string
+    minSolbody: string
   ): Promise<TransactionReceipt> {
-    if (this.oceanAddress == null) {
-      this.logger.error('ERROR: oceanAddress is not defined')
+    if (this.solbodyAddress == null) {
+      this.logger.error('ERROR: solbodyAddress is not defined')
       return null
     }
     const usershares = await this.sharesBalance(account, poolAddress)
@@ -858,31 +858,31 @@ export class OceanPool extends Pool {
     return super.exitswapPoolAmountIn(
       account,
       poolAddress,
-      this.oceanAddress,
+      this.solbodyAddress,
       poolShares,
-      minOcean
+      minSolbody
     )
   }
 
   /**
-   * Remove Ocean Token amount from pool liquidity based on the maximum pool shares allowed to be spent
+   * Remove Solbody Token amount from pool liquidity based on the maximum pool shares allowed to be spent
    * @param {String} account
    * @param {String} poolAddress
-   * @param {String} amount Ocean Token amount in OCEAN
+   * @param {String} amount Solbody Token amount in SOLBODY
    * @param {String} maximumPoolShares maximum pool shares allowed to be spent
    * @return {TransactionReceipt}
    */
-  public async removeOceanLiquidity(
+  public async removeSolbodyLiquidity(
     account: string,
     poolAddress: string,
     amount: string,
     maximumPoolShares: string
   ): Promise<TransactionReceipt> {
-    if (this.oceanAddress == null) {
-      this.logger.error('ERROR: oceanAddress is not defined')
+    if (this.solbodyAddress == null) {
+      this.logger.error('ERROR: solbodyAddress is not defined')
       return null
     }
-    const maxAmount = await this.getOceanMaxRemoveLiquidity(poolAddress)
+    const maxAmount = await this.getSolbodyMaxRemoveLiquidity(poolAddress)
     if (new Decimal(amount).greaterThan(maxAmount)) {
       this.logger.error('ERROR: Too much reserve to remove')
       return null
@@ -892,7 +892,7 @@ export class OceanPool extends Pool {
       this.logger.error('ERROR: Not enough poolShares')
       return null
     }
-    const sharesRequired = await this.getPoolSharesRequiredToRemoveOcean(
+    const sharesRequired = await this.getPoolSharesRequiredToRemoveSolbody(
       poolAddress,
       amount
     )
@@ -907,7 +907,7 @@ export class OceanPool extends Pool {
     return super.exitswapExternAmountOut(
       account,
       poolAddress,
-      this.oceanAddress,
+      this.solbodyAddress,
       amount,
       maximumPoolShares
     )
@@ -919,7 +919,7 @@ export class OceanPool extends Pool {
    * @param {String} poolAddress
    * @param {String} poolShares
    * @param {String} minDT Minimum DT expected (defaults 0)
-   * @param {String} poolShares Minim Ocean expected (defaults 0)
+   * @param {String} poolShares Minim Solbody expected (defaults 0)
    * @return {TransactionReceipt}
    */
   public async removePoolLiquidity(
@@ -927,7 +927,7 @@ export class OceanPool extends Pool {
     poolAddress: string,
     poolShares: string,
     minDT = '0',
-    minOcean = '0'
+    minSolbody = '0'
   ): Promise<TransactionReceipt> {
     const usershares = await this.sharesBalance(account, poolAddress)
     if (new Decimal(usershares).lessThan(poolShares)) {
@@ -938,7 +938,7 @@ export class OceanPool extends Pool {
     if (new Decimal(usershares).equals(poolShares))
       poolShares = new Decimal(poolShares).mul(0.9999).toString()
     // Balance bug fix
-    return this.exitPool(account, poolAddress, poolShares, [minDT, minOcean])
+    return this.exitPool(account, poolAddress, poolShares, [minDT, minSolbody])
   }
 
   /**
@@ -947,11 +947,11 @@ export class OceanPool extends Pool {
    * @return {String}
    */
   public async getDTPrice(poolAddress: string): Promise<string> {
-    if (this.oceanAddress == null) {
-      this.logger.error('ERROR: oceanAddress is not defined')
+    if (this.solbodyAddress == null) {
+      this.logger.error('ERROR: solbodyAddress is not defined')
       return '0'
     }
-    return this.getOceanNeeded(poolAddress, '1')
+    return this.getSolbodyNeeded(poolAddress, '1')
   }
 
   /**
@@ -978,48 +978,48 @@ export class OceanPool extends Pool {
     return result
   }
 
-  public async getOceanNeeded(poolAddress: string, dtRequired: string): Promise<string> {
+  public async getSolbodyNeeded(poolAddress: string, dtRequired: string): Promise<string> {
     const dtAddress = await this.getDTAddress(poolAddress)
     if (
       new Decimal(dtRequired).greaterThan(await this.getDTMaxBuyQuantity(poolAddress))
     ) {
       return '0'
     }
-    return this.calcInGivenOut(poolAddress, this.oceanAddress, dtAddress, dtRequired)
+    return this.calcInGivenOut(poolAddress, this.solbodyAddress, dtAddress, dtRequired)
   }
 
   /**
-   * Calculate how many Ocean Tokens are you going to receive for selling a specific dtAmount (selling DT)
+   * Calculate how many Solbody Tokens are you going to receive for selling a specific dtAmount (selling DT)
    * @param {String} poolAddress
    * @param {String} dtAmount
-   * @return {String[]} - amount of ocean tokens received
+   * @return {String[]} - amount of solbody tokens received
    */
-  public async getOceanReceived(poolAddress: string, dtAmount: string): Promise<string> {
+  public async getSolbodyReceived(poolAddress: string, dtAmount: string): Promise<string> {
     const dtAddress = await this.getDTAddress(poolAddress)
-    return this.calcOutGivenIn(poolAddress, dtAddress, this.oceanAddress, dtAmount)
+    return this.calcOutGivenIn(poolAddress, dtAddress, this.solbodyAddress, dtAmount)
   }
 
   /**
-   * Calculate how many data token are you going to receive for selling a specific oceanAmount (buying DT)
+   * Calculate how many data token are you going to receive for selling a specific solbodyAmount (buying DT)
    * @param {String} poolAddress
-   * @param {String} oceanAmount
-   * @return {String[]} - amount of ocean tokens received
+   * @param {String} solbodyAmount
+   * @return {String[]} - amount of solbody tokens received
    */
-  public async getDTReceived(poolAddress: string, oceanAmount: string): Promise<string> {
+  public async getDTReceived(poolAddress: string, solbodyAmount: string): Promise<string> {
     const dtAddress = await this.getDTAddress(poolAddress)
-    return this.calcOutGivenIn(poolAddress, this.oceanAddress, dtAddress, oceanAmount)
+    return this.calcOutGivenIn(poolAddress, this.solbodyAddress, dtAddress, solbodyAmount)
   }
 
-  public async getDTNeeded(poolAddress: string, OceanRequired: string): Promise<string> {
+  public async getDTNeeded(poolAddress: string, SolbodyRequired: string): Promise<string> {
     const dtAddress = await this.getDTAddress(poolAddress)
     if (
-      new Decimal(OceanRequired).greaterThan(
-        await this.getOceanMaxBuyQuantity(poolAddress)
+      new Decimal(SolbodyRequired).greaterThan(
+        await this.getSolbodyMaxBuyQuantity(poolAddress)
       )
     ) {
       return '0'
     }
-    return this.calcInGivenOut(poolAddress, dtAddress, this.oceanAddress, OceanRequired)
+    return this.calcInGivenOut(poolAddress, dtAddress, this.solbodyAddress, SolbodyRequired)
   }
 
   /**
@@ -1314,79 +1314,79 @@ export class OceanPool extends Pool {
     return new Decimal(newPrice).mul(100).div(initialPrice).minus(100).toString()
   }
 
-  /* Get slippage for buying some datatokens while spending exactly oceanAmount ocean tokens */
+  /* Get slippage for buying some datatokens while spending exactly solbodyAmount solbody tokens */
   public async computeBuySlippage(
     poolAddress: string,
-    oceanAmount: string
+    solbodyAmount: string
   ): Promise<string> {
     const dtAddress = await this.getDTAddress(poolAddress)
     const dtWeight = await super.getDenormalizedWeight(poolAddress, dtAddress)
-    const oceanWeight = await super.getDenormalizedWeight(poolAddress, this.oceanAddress)
+    const solbodyWeight = await super.getDenormalizedWeight(poolAddress, this.solbodyAddress)
     const dtReserve = await super.getReserve(poolAddress, dtAddress)
-    const oceanReserve = await super.getReserve(poolAddress, dtAddress)
+    const solbodyReserve = await super.getReserve(poolAddress, dtAddress)
     const swapFee = await super.getSwapFee(poolAddress)
     const dtReceived = await super.calcOutGivenIn(
       poolAddress,
-      oceanReserve,
-      oceanWeight,
+      solbodyReserve,
+      solbodyWeight,
       dtReserve,
       dtWeight,
-      oceanAmount,
+      solbodyAmount,
       swapFee
     )
     const newDtReserve = new BigNumber(this.web3.utils.toWei(dtReserve)).minus(
       this.web3.utils.toWei(dtReceived)
     )
-    const newOceanReserve = new BigNumber(this.web3.utils.toWei(oceanReserve)).plus(
-      this.web3.utils.toWei(oceanAmount)
+    const newSolbodyReserve = new BigNumber(this.web3.utils.toWei(solbodyReserve)).plus(
+      this.web3.utils.toWei(solbodyAmount)
     )
     const slippage = await this.computeSlippage(
       poolAddress,
-      oceanReserve,
-      oceanWeight,
+      solbodyReserve,
+      solbodyWeight,
       dtReserve,
       dtWeight,
-      this.web3.utils.fromWei(newOceanReserve.toString()),
+      this.web3.utils.fromWei(newSolbodyReserve.toString()),
       this.web3.utils.fromWei(newDtReserve.toString()),
       swapFee
     )
     return slippage
   }
 
-  /* Get slippage for selling an exact amount of datatokens to get some ocean tokens */
+  /* Get slippage for selling an exact amount of datatokens to get some solbody tokens */
   public async computeSellSlippage(
     poolAddress: string,
     dtAmount: string
   ): Promise<string> {
     const dtAddress = await this.getDTAddress(poolAddress)
     const dtWeight = await super.getDenormalizedWeight(poolAddress, dtAddress)
-    const oceanWeight = await super.getDenormalizedWeight(poolAddress, this.oceanAddress)
+    const solbodyWeight = await super.getDenormalizedWeight(poolAddress, this.solbodyAddress)
     const dtReserve = await super.getReserve(poolAddress, dtAddress)
-    const oceanReserve = await super.getReserve(poolAddress, dtAddress)
+    const solbodyReserve = await super.getReserve(poolAddress, dtAddress)
     const swapFee = await super.getSwapFee(poolAddress)
-    const oceanReceived = await super.calcOutGivenIn(
+    const solbodyReceived = await super.calcOutGivenIn(
       poolAddress,
       dtReserve,
       dtWeight,
-      oceanReserve,
-      oceanWeight,
+      solbodyReserve,
+      solbodyWeight,
       dtAmount,
       swapFee
     )
     const newDtReserve = new BigNumber(this.web3.utils.toWei(dtReserve)).plus(
       this.web3.utils.toWei(dtAmount)
     )
-    const newOceanReserve = new BigNumber(this.web3.utils.toWei(oceanReserve)).minus(
-      this.web3.utils.toWei(oceanReceived)
+    const newSolbodyReserve = new BigNumber(this.web3.utils.toWei(solbodyReserve)).minus(
+      this.web3.utils.toWei(solbodyReceived)
     )
     const slippage = await this.computeSlippage(
       poolAddress,
       dtReserve,
       dtWeight,
-      oceanReserve,
-      oceanWeight,
+      solbodyReserve,
+      solbodyWeight,
       this.web3.utils.fromWei(newDtReserve.toString()),
-      this.web3.utils.fromWei(newOceanReserve.toString()),
+      this.web3.utils.fromWei(newSolbodyReserve.toString()),
       swapFee
     )
     return slippage
