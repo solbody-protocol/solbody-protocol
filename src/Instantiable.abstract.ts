@@ -1,10 +1,10 @@
 import Web3 from 'web3'
 import Config from './models/Config'
 import { Logger, LoggerInstance } from './utils'
-import { Ocean } from './ocean/Ocean'
+import { Solbody } from './solbody/Solbody'
 
 export interface InstantiableConfig {
-  ocean: Ocean
+  solbody: Solbody
   config?: Config
   web3?: Web3
   logger?: Logger
@@ -21,11 +21,11 @@ export function generateIntantiableConfigFromConfig(
 }
 
 export abstract class Instantiable {
-  protected get ocean(): Ocean {
-    if (!this._ocean) {
-      LoggerInstance.error('Ocean instance is not defined.')
+  protected get solbody(): Solbody {
+    if (!this._solbody) {
+      LoggerInstance.error('Solbody instance is not defined.')
     }
-    return this._ocean
+    return this._solbody
   }
 
   protected get web3(): Web3 {
@@ -47,8 +47,8 @@ export abstract class Instantiable {
   }
 
   protected get instanceConfig(): InstantiableConfig {
-    const { ocean, web3, config, logger } = this
-    return { ocean, web3, config, logger }
+    const { solbody, web3, config, logger } = this
+    return { solbody, web3, config, logger }
   }
 
   public static async getInstance(...args: any[]): Promise<any>
@@ -59,15 +59,15 @@ export abstract class Instantiable {
 
   protected static setInstanceConfig<T extends Instantiable>(
     instance: T,
-    { ocean, config, web3, logger }: InstantiableConfig
+    { solbody, config, web3, logger }: InstantiableConfig
   ) {
-    instance._ocean = ocean
+    instance._solbody = solbody
     instance._config = config
     instance._web3 = web3
     instance._logger = logger
   }
 
-  private _ocean: Ocean
+  private _solbody: Solbody
 
   private _web3: Web3
 
